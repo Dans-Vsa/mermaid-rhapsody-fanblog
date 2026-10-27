@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence } from 'motion/react'
+import * as m from 'motion/react-m'
 import { lockScroll } from '../lib/scroll'
 
 /**
@@ -59,7 +60,7 @@ export function Modal({
   return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className={`modal ${className ?? ''}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -67,7 +68,7 @@ export function Modal({
           transition={{ duration: 0.35 }}
           onClick={(e) => e.target === e.currentTarget && onClose()}
         >
-          <motion.div
+          <m.div
             ref={panel}
             className="modal__panel"
             role="dialog"
@@ -79,8 +80,8 @@ export function Modal({
             transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
           >
             {children}
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body,

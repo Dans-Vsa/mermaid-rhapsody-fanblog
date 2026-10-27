@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import * as m from 'motion/react-m'
 import { LANGS, useI18n } from '../content/i18n'
 import { WORK } from '../content/work'
 import { AudioToggle } from './AudioToggle'
@@ -22,7 +22,7 @@ export function Header() {
         <div className="lang" role="group" aria-label={t.header.langLabel}>
           {LANGS.map((l) => (
             <button key={l} type="button" aria-pressed={lang === l} lang={l} onClick={() => setLang(l)}>
-              {lang === l && <motion.span layoutId="lang-pill" className="lang__pill" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
+              {lang === l && <m.span layoutId="lang-pill" className="lang__pill" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
               <span className="lang__label">{l.toUpperCase()}</span>
             </button>
           ))}

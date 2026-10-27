@@ -13,6 +13,7 @@ const id = {
     soundOff: 'Matikan suara laut',
   },
   gauge: { label: 'Kedalaman', jump: 'Turun ke', unit: 'm' },
+  loader: { filling: 'Mengisi napas', ready: 'Laut 3D siap', status: 'Memuat laut 3D' },
   spoiler: {
     hidden: 'Bagian ini mengandung spoiler',
     reveal: 'Buka spoiler',

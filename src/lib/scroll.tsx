@@ -1,18 +1,15 @@
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ReactLenis, type LenisRef } from 'lenis/react'
-import { anchorOf, dive, measureAnchors, updateDive } from './dive'
 import { SECTIONS } from '../content/sections'
+import { anchorOf, dive, measureAnchors, updateDive } from './dive'
+import { addTick } from './ticker'
 
-gsap.registerPlugin(ScrollTrigger)
-
-// Lenis scrolls the window itself, so native scroll events (and ScrollTrigger) keep working.
+// Lenis scrolls the window itself, so native scroll events keep working everywhere.
 let lenisRefGlobal: RefObject<LenisRef | null> | null = null
 
 /**
- * Smooth scroll (Lenis driven by the GSAP ticker, per Lenis docs) + the dive tracker.
- * With reduced motion Lenis is skipped and native scroll drives the same tracker.
+ * Smooth scroll (Lenis driven by our own rAF ticker with autoRaf off, per Lenis docs) + the dive
+ * tracker. With reduced motion Lenis is skipped and native scroll drives the same tracker.
  */
 export function ScrollProvider({ reduced, children }: { reduced: boolean; children: ReactNode }) {
   const lenisRef = useRef<LenisRef>(null)
@@ -20,11 +17,7 @@ export function ScrollProvider({ reduced, children }: { reduced: boolean; childr
   useEffect(() => {
     lenisRefGlobal = lenisRef
     dive.reducedMotion = reduced
-    const onResize = () => {
-      measureAnchors()
-      ScrollTrigger.refresh()
-    }
-    const ro = new ResizeObserver(onResize)
+    const ro = new ResizeObserver(() => measureAnchors())
     ro.observe(document.body)
 
     const onPointer = (e: PointerEvent) => {
@@ -34,18 +27,21 @@ export function ScrollProvider({ reduced, children }: { reduced: boolean; childr
     addEventListener('pointermove', onPointer, { passive: true })
 
     const root = document.documentElement
-    const tick = (time: number) => {
-      lenisRef.current?.lenis?.raf(time * 1000)
+    let lastProgress = -1
+    const stop = addTick((time) => {
+      lenisRef.current?.lenis?.raf(time)
       updateDive(scrollY)
-      root.style.setProperty('--dive', dive.progress.toFixed(4))
-    }
-    gsap.ticker.add(tick)
-    gsap.ticker.lagSmoothing(0)
+      // only touch the style when it actually changed (avoids style recalcs every frame)
+      if (Math.abs(dive.progress - lastProgress) > 0.0005) {
+        lastProgress = dive.progress
+        root.style.setProperty('--dive', dive.progress.toFixed(4))
+      }
+    })
 
     return () => {
       ro.disconnect()
       removeEventListener('pointermove', onPointer)
-      gsap.ticker.remove(tick)
+      stop()
     }
   }, [reduced])
 

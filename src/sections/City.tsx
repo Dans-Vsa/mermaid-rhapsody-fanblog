@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { AnimatePresence, LayoutGroup, motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
+import { AnimatePresence, LayoutGroup, useReducedMotion, useScroll, useTransform } from 'motion/react'
+import * as m from 'motion/react-m'
 import { useI18n } from '../content/i18n'
 import { CLIP_STILLS, TRAILERS, type Still } from '../content/media'
 import { dive } from '../lib/dive'
@@ -53,7 +54,7 @@ function CharacterCard({ id, index }: { id: CharId; index: number }) {
   const bodyId = `char-${id}`
 
   return (
-    <motion.li
+    <m.li
       layout={!reduced}
       className={`card card--${id}${open ? ' is-open' : ''}`}
       initial={{ opacity: 0, y: 30 }}
@@ -65,7 +66,7 @@ function CharacterCard({ id, index }: { id: CharId; index: number }) {
       onFocus={() => (dive.focus = id)}
       onBlur={() => (dive.focus = null)}
     >
-      <motion.div layout="position" className="card__head">
+      <m.div layout="position" className="card__head">
         <span className="card__index" aria-hidden="true">
           0{index + 1}
         </span>
@@ -73,14 +74,14 @@ function CharacterCard({ id, index }: { id: CharId; index: number }) {
         <T as="p" className="card__role">
           {c.role}
         </T>
-      </motion.div>
-      <motion.dl layout="position" className="card__facts">
+      </m.div>
+      <m.dl layout="position" className="card__facts">
         <T as="dt">{s.knownLabel}</T>
         <T as="dd">{c.known}</T>
-      </motion.dl>
+      </m.dl>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
+          <m.div
             id={bodyId}
             className="card__more"
             initial={{ opacity: 0 }}
@@ -95,14 +96,14 @@ function CharacterCard({ id, index }: { id: CharId; index: number }) {
             <T as="p" className="card__note">
               {c.note}
             </T>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-      <motion.button layout="position" type="button" className="card__toggle" aria-expanded={open} aria-controls={bodyId} onClick={() => setOpen(!open)}>
+      <m.button layout="position" type="button" className="card__toggle" aria-expanded={open} aria-controls={bodyId} onClick={() => setOpen(!open)}>
         <T>{open ? s.less : s.more}</T>
         <span aria-hidden="true">{open ? '−' : '+'}</span>
-      </motion.button>
-    </motion.li>
+      </m.button>
+    </m.li>
   )
 }
 
@@ -164,7 +165,7 @@ function Clips() {
         </Reveal>
 
         {CLIP_STILLS.map((still, i) => (
-          <motion.figure
+          <m.figure
             key={still.id}
             className={`float float--${i}`}
             style={reduced ? undefined : { y: drift[i] }}
@@ -172,7 +173,7 @@ function Clips() {
           >
             <StillArt still={still} />
             <FloatCaption still={still} soon={s.stillSoon} />
-          </motion.figure>
+          </m.figure>
         ))}
       </div>
     </div>

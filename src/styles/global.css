@@ -492,9 +492,15 @@ a {
     width: 28px;
   }
 
+  /* hidden visually on phones but still the buttons' accessible names */
   .gauge__name,
   .gauge__depth {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .gauge__rail button {

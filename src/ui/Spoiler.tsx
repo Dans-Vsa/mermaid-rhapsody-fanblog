@@ -1,5 +1,6 @@
 import { useEffect, useId, useState, type ReactNode } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence } from 'motion/react'
+import * as m from 'motion/react-m'
 import { useI18n } from '../content/i18n'
 import { SpoilerContext, useSpoilers } from './spoilerState'
 
@@ -27,7 +28,7 @@ export function Spoiler({ children }: { children: ReactNode }) {
 
   return (
     <div className={`spoiler${open ? ' is-open' : ''}`}>
-      <motion.div
+      <m.div
         id={id}
         className="spoiler__body"
         aria-hidden={!open}
@@ -37,15 +38,15 @@ export function Spoiler({ children }: { children: ReactNode }) {
         transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }}
       >
         {children}
-      </motion.div>
+      </m.div>
       <AnimatePresence initial={false}>
         {!open && (
-          <motion.div className="spoiler__veil" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <m.div className="spoiler__veil" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <p className="spoiler__label">{t.spoiler.hidden}</p>
             <button type="button" className="pill pill--small" aria-expanded={open} aria-controls={id} onClick={() => setOpen(true)}>
               {t.spoiler.reveal}
             </button>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
       {open && !revealAll && (
@@ -63,7 +64,7 @@ export function SpoilerToggle() {
   return (
     <button type="button" className="switch" role="switch" aria-checked={revealAll} onClick={() => setRevealAll(!revealAll)}>
       <span className="switch__track" aria-hidden="true">
-        <motion.span className="switch__thumb" layout transition={{ type: 'spring', stiffness: 500, damping: 34 }} />
+        <m.span className="switch__thumb" layout transition={{ type: 'spring', stiffness: 500, damping: 34 }} />
       </span>
       {t.spoiler.revealAll}
     </button>

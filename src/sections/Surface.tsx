@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { useReducedMotion } from 'motion/react'
+import * as m from 'motion/react-m'
 import { useI18n } from '../content/i18n'
 import { WORK } from '../content/work'
 import { scrollToSection } from '../lib/scroll'
@@ -18,23 +19,23 @@ export function Surface() {
       {/* the title in kanji surfaces one character at a time, like bubbles */}
       <p className="kanji" aria-hidden="true">
         {kanji.map((ch, i) => (
-          <motion.span
+          <m.span
             key={i}
             initial={{ opacity: 0, y: reduced ? 0 : 18, filter: 'blur(8px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 1.4, delay: 0.5 + i * 0.16, ease }}
           >
             {ch}
-          </motion.span>
+          </m.span>
         ))}
       </p>
       <div className="sec__body">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 1.4 }}>
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 1.4 }}>
           <T as="p" className="eyebrow">
             {s.eyebrow}
           </T>
-        </motion.div>
-        <motion.h1
+        </m.div>
+        <m.h1
           id="surface-title"
           tabIndex={-1}
           initial={{ opacity: 0, y: reduced ? 0 : 24 }}
@@ -43,8 +44,8 @@ export function Surface() {
         >
           <span className="sr-only">{WORK.titleJp} </span>
           {s.title}
-        </motion.h1>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 1.9 }} className="stack">
+        </m.h1>
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 1.9 }} className="stack">
           <T as="p" className="lede">
             {s.lede}
           </T>
@@ -53,7 +54,7 @@ export function Surface() {
               <T>{s.dive}</T>
             </button>
           </Magnetic>
-        </motion.div>
+        </m.div>
       </div>
       <p className="scroll-hint" aria-hidden="true">
         {s.scrollHint}

@@ -1,7 +1,8 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { AdaptiveDpr, PerformanceMonitor, Preload } from '@react-three/drei'
+import { AdaptiveDpr, PerformanceMonitor, Preload, useProgress } from '@react-three/drei'
 import { isLowPowerDevice } from '../lib/env'
+import { setLoading } from '../lib/loading'
 import { useReducedMotion } from '../lib/useReducedMotion'
 import { Atmosphere } from './Atmosphere'
 import { CameraRig } from './CameraRig'
@@ -44,6 +45,24 @@ function QualityGuard({ onLow }: { onLow: () => void }) {
       }
     }
   })
+  return null
+}
+
+/** Streams drei's loader progress into the main-bundle preloader store. */
+function ProgressReporter() {
+  const progress = useProgress((s) => s.progress)
+  useEffect(() => {
+    setLoading({ progress: Math.min(progress, 99) })
+  }, [progress])
+  return null
+}
+
+/** Rendered once everything inside Suspense has resolved and shaders are compiled. */
+function Ready() {
+  useEffect(() => {
+    const t = window.setTimeout(() => setLoading({ phase: 'ready', progress: 100 }), 250)
+    return () => window.clearTimeout(t)
+  }, [])
   return null
 }
 
@@ -104,7 +123,9 @@ export default function Experience() {
         <Fish count={lowPower ? 80 : 160} />
         {/* compile every shader up front so the first scroll into the city does not hitch */}
         <Preload all />
+        <Ready />
       </Suspense>
+      <ProgressReporter />
       {tier === 'high' && !reduced && <Effects />}
     </Canvas>
   )

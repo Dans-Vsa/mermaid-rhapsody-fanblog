@@ -1,5 +1,5 @@
 import { Fragment, type ElementType, type ReactNode } from 'react'
-import { motion } from 'motion/react'
+import * as m from 'motion/react-m'
 import { useI18n } from '../content/i18n'
 
 const SPLIT = /(\d+-\d+)/
@@ -32,16 +32,16 @@ export function T({ children, as = 'span', className, id, tabIndex }: { children
   const Tag = as
   return (
     <Tag className={className} id={id} tabIndex={tabIndex}>
-      <motion.span key={lang} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
+      <m.span key={lang} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
         <Nw>{children}</Nw>
-      </motion.span>
+      </m.span>
     </Tag>
   )
 }
 
 /** Fades and lifts its children in once, the first time they enter the viewport. */
 export function Reveal({ children, delay = 0, className, as = 'div' }: { children: ReactNode; delay?: number; className?: string; as?: 'div' | 'li' | 'p' | 'section' }) {
-  const M = motion[as]
+  const M = m[as]
   return (
     <M
       className={className}

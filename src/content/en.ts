@@ -13,6 +13,7 @@ const en: Dict = {
     soundOff: 'Turn off sea sound',
   },
   gauge: { label: 'Depth', jump: 'Dive to', unit: 'm' },
+  loader: { filling: 'Filling lungs', ready: '3D sea ready', status: 'Loading the 3D sea' },
   spoiler: {
     hidden: 'This part contains spoilers',
     reveal: 'Reveal spoiler',

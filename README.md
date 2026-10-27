@@ -32,8 +32,20 @@ src/lib/            store kedalaman (dive), scroll, ambience WebAudio
 blender/            build_assets.py + helpers.py: membangun ulang semua GLB dari nol
 public/models/      GLB hasil ekspor
 public/draco/       decoder Draco (di-host sendiri)
+tools/build-fonts.py subset Shippori Mincho B1 ke glyph Jepang yang dipakai
 public/media/stills still resmi yang disediakan pemilik situs (kosong = placeholder bertema)
 ```
+
+## Performa
+
+- Laut CSS, judul, dan semua teks tampil instan. Scene 3D (three.js, ~300 KB gzip) baru dimuat pada tanda
+  pertama ada pembaca (gerak kursor, sentuh, scroll, tombol); di desktop juga otomatis setelah 6 detik.
+  Preloader gelembung di kiri bawah menunjukkan progresnya.
+- Kualitas adaptif: DPR mengikuti `PerformanceMonitor`; post-processing (riak, DOF, bloom) hanya di tier tinggi
+  dan dimatikan otomatis kalau fps < 40 selama 3 detik. HP: tanpa post-processing, tanpa backdrop blur.
+- Fitur animasi Motion dimuat async (`LazyMotion`), font Jepang di-subset (`python tools/build-fonts.py`
+  setelah menambah teks Jepang baru).
+- Lighthouse (build produksi): desktop 100/100/100/100, mobile 93/100/100/100.
 
 ## Menambah still
 

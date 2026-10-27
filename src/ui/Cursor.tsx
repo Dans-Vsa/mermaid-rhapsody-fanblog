@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'motion/react'
+import { useMotionValue, useReducedMotion, useSpring } from 'motion/react'
+import * as m from 'motion/react-m'
 
 /**
  * A soft ring that trails the pointer and swells over interactive elements. Fine pointers only; the
@@ -35,7 +36,7 @@ export function Cursor() {
 
   if (!enabled || reduced) return null
   return (
-    <motion.div
+    <m.div
       className="cursor"
       aria-hidden="true"
       style={{ x: sx, y: sy }}

@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence } from 'motion/react'
+import * as m from 'motion/react-m'
 import { useI18n } from '../content/i18n'
 import { STILLS } from '../content/media'
 import { Modal } from '../ui/Modal'
@@ -66,7 +67,7 @@ export function Gallery() {
               </button>
             </div>
             <AnimatePresence mode="wait">
-              <motion.figure
+              <m.figure
                 key={current.id}
                 className="lightbox__figure"
                 initial={{ opacity: 0, x: 20 }}
@@ -91,7 +92,7 @@ export function Gallery() {
                     ) : null}
                   </small>
                 </figcaption>
-              </motion.figure>
+              </m.figure>
             </AnimatePresence>
             <div className="lightbox__nav">
               <button type="button" className="pill pill--small" onClick={() => step(-1)}>

@@ -1,16 +1,16 @@
 import type { CSSProperties } from 'react'
 import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
 import { SECTIONS } from '../content/sections'
 import { useI18n } from '../content/i18n'
 import { dive } from '../lib/dive'
 import { scrollToSection } from '../lib/scroll'
+import { addTick } from '../lib/ticker'
 
 const MAX = SECTIONS[SECTIONS.length - 1].depth
 
 /**
  * Depth gauge on the side of the screen. The marker and readout are written straight to the DOM
- * from the GSAP ticker (no React re-render per frame). Ticks are real buttons for keyboard users.
+ * from the shared rAF ticker (no React re-render per frame). Ticks are real buttons for keyboard users.
  */
 export function DepthGauge() {
   const { t } = useI18n()
@@ -37,8 +37,7 @@ export function DepthGauge() {
         })
       }
     }
-    gsap.ticker.add(tick)
-    return () => gsap.ticker.remove(tick)
+    return addTick(tick)
   }, [])
 
   return (
@@ -53,9 +52,12 @@ export function DepthGauge() {
           {SECTIONS.map((s) => (
             <li key={s.id} style={{ '--y': s.depth / MAX } as CSSProperties}>
               <button type="button" onClick={() => scrollToSection(s.id)}>
-                <span className="gauge__depth">{s.depth}</span>
+                <span className="sr-only">{t.gauge.jump} </span>
+                <span className="gauge__depth">
+                  {s.depth}
+                  <span className="sr-only"> {t.gauge.unit} </span>
+                </span>
                 <span className="gauge__name">
-                  <span className="sr-only">{t.gauge.jump} </span>
                   {t.sections[s.id].name}
                 </span>
               </button>

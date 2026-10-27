@@ -4,7 +4,7 @@ import { Color, Vector3 } from 'three'
 // pos: where the camera floats, look: what it looks at, water: fog/background tint at that depth.
 export const KEYFRAMES = [
   // surface: just under the water, tilted up toward the light
-  { pos: [0, -3, 12], look: [0, 1.5, -10], water: '#0F6F8E', fog: 0.02 },
+  { pos: [0, -3, 12], look: [0, 1.5, -10], water: '#0B5C79', fog: 0.02 },
   // whale: drifting past its flank
   { pos: [-4, -15, 6], look: [7, -19, -8], water: '#0C5E7E', fog: 0.024 },
   // sunken city: rooftops come into view

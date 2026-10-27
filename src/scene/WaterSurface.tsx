@@ -89,10 +89,10 @@ export function WaterSurface() {
             float window = exp(-d2 * 0.018) * smoothstep(-45.0, -1.0, uCam.y);
             float dist = distance(vWorld, uCam);
             float fade = exp(-dist * 0.012);
-            vec3 col = vec3(0.1, 0.3, 0.38) * (0.5 + 0.22 * w)
+            vec3 col = vec3(0.08, 0.26, 0.34) * (0.45 + 0.2 * w)
                      + vec3(0.45, 0.78, 0.86) * (window * 0.22 + shimmer * 0.2 + ring * 0.4);
             // stays well under the bloom threshold so the hero copy keeps its contrast
-            gl_FragColor = vec4(min(col * fade, vec3(0.42)), 1.0);
+            gl_FragColor = vec4(min(col * fade, vec3(0.34)), 1.0);
           }
         `}
       />

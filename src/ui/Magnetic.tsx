@@ -1,5 +1,6 @@
 import { useRef, type ReactNode } from 'react'
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'motion/react'
+import { useMotionValue, useReducedMotion, useSpring } from 'motion/react'
+import * as m from 'motion/react-m'
 
 const fine = typeof matchMedia !== 'undefined' && matchMedia('(pointer: fine)').matches
 
@@ -14,7 +15,7 @@ export function Magnetic({ children, strength = 0.28 }: { children: ReactNode; s
   const active = fine && !reduced
 
   return (
-    <motion.span
+    <m.span
       ref={ref}
       className="magnetic"
       style={active ? { x: sx, y: sy } : undefined}
@@ -30,6 +31,6 @@ export function Magnetic({ children, strength = 0.28 }: { children: ReactNode; s
       }}
     >
       {children}
-    </motion.span>
+    </m.span>
   )
 }
