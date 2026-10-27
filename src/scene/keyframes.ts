@@ -16,7 +16,7 @@ export const KEYFRAMES = [
   // info: over the plaza with the piano
   { pos: [0, -70, -26], look: [0, -78, -42], water: '#05243B', fog: 0.04 },
   // seabed
-  { pos: [0, -84, -36], look: [0, -90, -54], water: '#031627', fog: 0.046 },
+  { pos: [5, -82, -64], look: [-3, -89, -86], water: '#031627', fog: 0.046 },
 ].map((k) => ({
   pos: new Vector3(...(k.pos as [number, number, number])),
   look: new Vector3(...(k.look as [number, number, number])),
