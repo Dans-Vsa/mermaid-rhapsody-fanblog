@@ -72,7 +72,7 @@ def build_mermaid():
         return obj_from_bm(bm, name, col, color)
 
     torso = loft_up([(0.0, 0.15, 0.11, 0), (0.22, 0.16, 0.11, 0), (0.42, 0.19, 0.12, 0), (0.58, 0.14, 0.10, 0), (0.68, 0.05, 0.05, 0)], 10, "torso", SKIN)
-    tail = loft_up([(0.02, 0.155, 0.115, 0), (-0.35, 0.18, 0.13, 0), (-0.85, 0.15, 0.11, 0.02), (-1.35, 0.10, 0.075, 0.04), (-1.75, 0.055, 0.04, 0.05), (-1.92, 0.035, 0.028, 0.05)], 10, "tail", "#FF6FAE")
+    tail = loft_up([(0.02, 0.155, 0.115, 0), (-0.35, 0.18, 0.13, 0), (-0.85, 0.15, 0.11, 0.02), (-1.35, 0.10, 0.075, 0.04), (-1.75, 0.055, 0.04, 0.05), (-1.92, 0.035, 0.028, 0.05)], 10, "tail", "#DB0C80")
     bm = bmesh.new()
     bmesh.ops.create_uvsphere(bm, u_segments=10, v_segments=8, radius=0.13)
     bmesh.ops.translate(bm, vec=(0, 0, 0.84), verts=bm.verts)
@@ -91,18 +91,20 @@ def build_mermaid():
     bm = flat_shape(mirrored([(0.04, 0.0), (-0.1, 0.18), (-0.36, 0.42), (-0.32, 0.47), (-0.18, 0.36), (-0.2, 0.05)]), 0.04)
     bmesh.ops.transform(bm, matrix=UP, verts=bm.verts)
     bmesh.ops.translate(bm, vec=(-0.03, 0, -1.88), verts=bm.verts)
-    fluke = obj_from_bm(bm, "fluke", col, "#F4E85C")
+    fluke = obj_from_bm(bm, "fluke", col, "#F7F022")
     mer = join([torso, tail, head, hair, *arms, fluke], "Mermaid")
     shade_smooth(mer)
     me = mer.data
     attr = me.color_attributes["Col"]
-    pink, yel = hex_rgba("#FF6FAE"), hex_rgba("#F4E85C")
-    for poly in me.polygons:  # neon tail gradient below the waist (not the hair)
+    pink, cyan = hex_rgba("#DB0C80"), hex_rgba("#0C99D8")
+    # tail colours follow the title lettering of the key visual: magenta -> cyan fill, yellow halo
+    # (the fluke keeps its yellow). Only below the waist, not the hair, not the fluke.
+    for poly in me.polygons:
         c = poly.center
-        if c.z < 0.0 and abs(c.y) < 0.5 and c.x > -0.25:
+        if -1.86 < c.z < 0.0 and abs(c.y) < 0.5 and c.x > -0.25:
             for li in poly.loop_indices:
-                t = max(0, min(1, -me.vertices[me.loops[li].vertex_index].co.z / 2.2))
-                attr.data[li].color = tuple(pink[i] + (yel[i] - pink[i]) * t for i in range(4))
+                t = max(0, min(1, -me.vertices[me.loops[li].vertex_index].co.z / 1.9))
+                attr.data[li].color = tuple(pink[i] + (cyan[i] - pink[i]) * t for i in range(4))
     return col
 
 

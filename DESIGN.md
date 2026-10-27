@@ -13,11 +13,18 @@ seabed. Mood: quiet, melancholic, strange-romantic. Dials: variance 6, motion 6,
 ## Project adaptations
 - **Theme: dark only** (`color-scheme: dark`). No light mode, the sea gets darker as you go down.
 - **Palette (sea):** abyss `#041C32`, mid `#0B4F6C`, shallow `#1AA7C7`, surface light `#9FEFFF`.
-  Text: bone `#EDE6D6` (ink), `#C9C3B4` (body), `#8FA3AD` (mute), hairline `rgb(237 230 214 / .14)`.
-- **Accents (neon, from the title lettering):** yellow `#F4E85C`, pink `#FF6FAE`. Only for: the kanji title glow,
-  focus ring (yellow), active/hover states, spoiler reveal edge (pink). Never as a fill behind text, never as gradient
-  pairs. Values are provisional until sampled from an official key visual.
-- **Bugatti no-accent rule is overridden** by the two neon accents above; nothing else gets color.
+  Text: bone `#EDE6D6` (ink), `#C9C3B4` (body), `#A7BAC2` (mute), hairline `rgb(237 230 214 / .14)`.
+- **Accents (neon), sampled from the title lettering of the official key visual** (hub cover
+  `assets/covers/mermaid-rhapsody-color.webp`, median of saturated pixels per hue band in the logo):
+  - yellow `#F7F022` (the halftone halo around the letters). 14.3:1 on abyss, 7.4:1 on mid: safe for small text,
+    focus ring, depth figures, the gauge marker.
+  - magenta `#DB0C80` (letter fill, start of the gradient). 3.6:1 on abyss, 1.9:1 on mid: glows, edges, the switch,
+    gradients and the 3D tail only, never small text. Text tint `#E96DB3` (6:1 on abyss) for spoiler labels.
+  - cyan `#0C99D8` (letter fill, end of the gradient). Only paired with magenta.
+  - The logo's signature, **magenta → cyan fill inside a yellow halo**, is quoted three times and nowhere else: the
+    accent edge of Shiju's card, the kanji title glow (yellow halo + a breath of magenta), the mermaid's tail
+    (magenta → cyan, yellow fluke). Never as a fill behind text.
+- **Bugatti no-accent rule is overridden** by these three neon accents; nothing else gets color.
 - **Typography (three-family split kept, body is sans per brief):**
   - Display + Japanese: **Shippori Mincho B1** (400/700). The title 人魚ラプソディ is a visual element: huge,
     `writing-mode: vertical-rl` on desktop. Latin display headlines use it in sentence case with 0.02em tracking

@@ -43,7 +43,7 @@ export function Whale() {
  */
 export function Mermaid() {
   const geometry = useMermaidGeometry()
-  const material = useMaterial({ deform: 'mermaid', rim: '#FFB3D1', rimStrength: 0.6 })
+  const material = useMaterial({ deform: 'mermaid', rim: '#F08CC4', rimStrength: 0.6 })
   const ref = useRef<Group>(null)
   const shy = useRef(0)
   useFrame(({ clock, camera }, dt) => {
