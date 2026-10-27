@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { CatmullRomCurve3, MathUtils, Vector3 } from 'three'
+import { CatmullRomCurve3, MathUtils, PerspectiveCamera, Vector3 } from 'three'
 import { dive } from '../lib/dive'
 import { KEYFRAMES } from './keyframes'
 
@@ -20,7 +20,14 @@ export function CameraRig() {
   const look = useRef(new Vector3().copy(KEYFRAMES[0].look))
   const first = useRef(true)
 
-  useFrame((_, dt) => {
+  useFrame(({ size }, dt) => {
+    // portrait screens get a wider lens so the whale and the mermaid stay in frame beside the text
+    const fov = size.width / size.height < 0.8 ? 66 : 50
+    const cam = camera as PerspectiveCamera
+    if (cam.fov !== fov) {
+      cam.fov = fov
+      cam.updateProjectionMatrix()
+    }
     const reduced = dive.reducedMotion
     const section = reduced ? Math.round(dive.section) : dive.section
     // getPoint is parametric by segment for open curves, so t = i/(n-1) lands exactly on keyframe i.

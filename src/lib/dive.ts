@@ -12,6 +12,8 @@ export const dive = {
   /** pointer in -1 .. 1, y up */
   pointer: { x: 0, y: 0 },
   reducedMotion: false,
+  /** character a card is pointing at (hover/focus), so the 3D scene can react */
+  focus: null as null | 'toshihide' | 'shiju',
 }
 
 let anchors: number[] = []

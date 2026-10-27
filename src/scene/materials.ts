@@ -118,6 +118,8 @@ export function makeToonMaterial({
         totalEmissiveRadiance += diffuseColor.rgb * mrC * mrUp * mrLightAtDepth(vMrWorld.y) * uCausticAmount * uCaustics;`,
       )
   }
+  // exposed so scene code can animate the rim (e.g. the mermaid lighting up when her card is focused)
+  mat.userData.rimStrength = uRimStrength
   // distinct cache key per variant so three does not share programs across variants
   mat.customProgramCacheKey = () => `mr-toon-${deform}-${color === undefined ? 'vc' : 'flat'}`
   return mat

@@ -68,3 +68,11 @@ export function scrollToSection(id: string) {
   else window.scrollTo(0, target)
   el.querySelector<HTMLElement>('h1, h2')?.focus({ preventScroll: true })
 }
+
+/** Freeze page scroll while a modal (lightbox, about) is open. */
+export function lockScroll(lock: boolean) {
+  const lenis = lenisRefGlobal?.current?.lenis
+  if (lock) lenis?.stop()
+  else lenis?.start()
+  document.documentElement.style.overflow = lock ? 'hidden' : ''
+}

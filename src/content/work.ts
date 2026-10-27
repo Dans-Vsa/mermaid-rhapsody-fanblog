@@ -15,5 +15,7 @@ export const WORK = {
     studio: '100studio', // TODO: verify (hub data, no primary source yet)
   },
   hubUrl: 'https://dans-vsa.github.io/fujimoto-archive/',
+  // TODO: confirm the takedown channel with the site owner (repo name is not created yet)
+  takedownUrl: 'https://github.com/Dans-Vsa/mermaid-rhapsody-fanblog/issues/new',
   hubWorkUrl: 'https://dans-vsa.github.io/fujimoto-archive/karya.html?id=mermaid-rhapsody',
 } as const
