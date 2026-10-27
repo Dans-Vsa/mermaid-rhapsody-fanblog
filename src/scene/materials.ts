@@ -1,10 +1,15 @@
 import { Color, DataTexture, MeshToonMaterial, NearestFilter, RedFormat, type WebGLProgramParametersWithUniforms } from 'three'
+import { CAUSTIC_GLSL, LIGHT_AT_DEPTH_GLSL } from './shaders'
 
-// One look for every asset: flat-ish toon steps from the vertex colours + a cyan rim light, so the
-// models read as painted shapes against the fog (DESIGN.md: stylized, not realistic).
+// One look for every asset: flat-ish toon steps from the vertex colours, a cyan rim light, and
+// caustics on surfaces that face the surface light (DESIGN.md: stylized, not realistic).
 
-/** Shared clock for every deforming shader. Advanced once per frame in Experience. */
-export const sharedUniforms = { uTime: { value: 0 } }
+/** Shared uniforms for every custom shader. Advanced once per frame in Experience. */
+export const sharedUniforms = {
+  uTime: { value: 0 },
+  /** 0 (off) .. 1; dropped to 0 with reduced motion */
+  uCaustics: { value: 1 },
+}
 
 let gradient: DataTexture | null = null
 function toonGradient() {
@@ -49,30 +54,71 @@ export function makeToonMaterial({
   deform = 'none',
   rim = '#9FEFFF',
   rimStrength = 0.55,
-}: { deform?: Deform; rim?: string; rimStrength?: number } = {}) {
-  const mat = new MeshToonMaterial({ vertexColors: true, gradientMap: toonGradient() })
+  color,
+  caustics = 0.9,
+}: {
+  deform?: Deform
+  rim?: string
+  rimStrength?: number
+  /** flat colour for meshes without a vertex colour attribute */
+  color?: string
+  caustics?: number
+} = {}) {
+  const mat = new MeshToonMaterial({
+    vertexColors: color === undefined,
+    color: color ?? '#ffffff',
+    gradientMap: toonGradient(),
+  })
   const uRim = { value: new Color(rim) }
   const uRimStrength = { value: rimStrength }
+  const uCausticAmount = { value: caustics }
 
   mat.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
     shader.uniforms.uTime = sharedUniforms.uTime
+    shader.uniforms.uCaustics = sharedUniforms.uCaustics
     shader.uniforms.uRim = uRim
     shader.uniforms.uRimStrength = uRimStrength
-    if (deform !== 'none') {
-      shader.vertexShader = shader.vertexShader
-        .replace('#include <common>', '#include <common>\nuniform float uTime;')
-        .replace('#include <begin_vertex>', `#include <begin_vertex>\n${DEFORM[deform]}`)
-    }
+    shader.uniforms.uCausticAmount = uCausticAmount
+
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nuniform float uTime;\nvarying vec3 vMrWorld;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>\n${deform === 'none' ? '' : DEFORM[deform]}`)
+      .replace(
+        '#include <project_vertex>',
+        `#include <project_vertex>
+        vec4 mrWp = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          mrWp = instanceMatrix * mrWp;
+        #endif
+        vMrWorld = (modelMatrix * mrWp).xyz;`,
+      )
+
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform vec3 uRim;\nuniform float uRimStrength;')
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform vec3 uRim;
+        uniform float uRimStrength;
+        uniform float uTime;
+        uniform float uCaustics;
+        uniform float uCausticAmount;
+        varying vec3 vMrWorld;
+        ${CAUSTIC_GLSL}
+        ${LIGHT_AT_DEPTH_GLSL}`,
+      )
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
         float rimF = 1.0 - saturate(dot(normalize(normal), normalize(vViewPosition)));
-        totalEmissiveRadiance += uRim * pow(rimF, 3.0) * uRimStrength;`,
+        totalEmissiveRadiance += uRim * pow(rimF, 3.0) * uRimStrength;
+        // caustics: only on up-facing surfaces, fading with depth
+        vec3 mrN = inverseTransformDirection(normal, viewMatrix);
+        float mrUp = smoothstep(0.15, 0.85, mrN.y);
+        float mrC = mrCaustic(vMrWorld.xz * 0.06, uTime * 0.35);
+        totalEmissiveRadiance += diffuseColor.rgb * mrC * mrUp * mrLightAtDepth(vMrWorld.y) * uCausticAmount * uCaustics;`,
       )
   }
-  // distinct cache key per variant so three does not share programs across deform types
-  mat.customProgramCacheKey = () => `mr-toon-${deform}`
+  // distinct cache key per variant so three does not share programs across variants
+  mat.customProgramCacheKey = () => `mr-toon-${deform}-${color === undefined ? 'vc' : 'flat'}`
   return mat
 }

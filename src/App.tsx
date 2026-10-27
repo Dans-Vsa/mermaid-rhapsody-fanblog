@@ -23,6 +23,8 @@ export default function App() {
             <Experience />
           </Suspense>
         )}
+        {/* vignette + film grain: cheap CSS layers, kept on every device */}
+        <div className="lens" aria-hidden="true" />
         <Header />
         <DepthGauge />
         <Sections />

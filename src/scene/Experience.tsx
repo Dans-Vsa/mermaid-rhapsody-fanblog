@@ -1,28 +1,74 @@
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { AdaptiveDpr, PerformanceMonitor } from '@react-three/drei'
+import { AdaptiveDpr, PerformanceMonitor, Preload } from '@react-three/drei'
 import { isLowPowerDevice } from '../lib/env'
+import { useReducedMotion } from '../lib/useReducedMotion'
 import { Atmosphere } from './Atmosphere'
 import { CameraRig } from './CameraRig'
 import { Seabed, SunkenCity } from './City'
 import { Fish, Mermaid, Whale } from './Creatures'
+import { Effects } from './Effects'
+import { LightShafts } from './LightShafts'
 import { sharedUniforms } from './materials'
 import { preloadModels } from './models/assets'
+import { Bubbles, MarineSnow } from './Particles'
 import { WaterSurface } from './WaterSurface'
 
 const lowPower = isLowPowerDevice()
+const MAX_DPR = lowPower ? 1.25 : 1.75
 preloadModels()
 
-function Clock() {
+type Tier = 'high' | 'low'
+
+/**
+ * Drops to the low tier (no post-processing) only on sustained slowness: average fps under 40 for
+ * three seconds in a row, ignoring the first seconds while assets and shaders settle.
+ */
+function QualityGuard({ onLow }: { onLow: () => void }) {
+  const s = useRef({ elapsed: 0, frames: 0, window: 0, slow: 0, done: false })
   useFrame((_, dt) => {
-    sharedUniforms.uTime.value += Math.min(dt, 0.1)
+    const st = s.current
+    if (st.done) return
+    st.elapsed += dt
+    if (st.elapsed < 4) return
+    st.frames++
+    st.window += dt
+    if (st.window >= 1) {
+      const fps = st.frames / st.window
+      st.slow = fps < 40 ? st.slow + 1 : 0
+      st.frames = 0
+      st.window = 0
+      if (st.slow >= 3) {
+        st.done = true
+        onLow()
+      }
+    }
+  })
+  return null
+}
+
+function Clock({ reduced }: { reduced: boolean }) {
+  useFrame((_, dt) => {
+    // reduced motion: time runs very slowly so nothing drifts noticeably, caustics are off
+    sharedUniforms.uTime.value += Math.min(dt, 0.1) * (reduced ? 0.15 : 1)
   })
   return null
 }
 
 /** The whole 3D dive. Loaded lazily from App so the HTML is interactive before three.js arrives. */
 export default function Experience() {
+  const reduced = useReducedMotion()
   const [dpr, setDpr] = useState(lowPower ? 1 : 1.5)
+  // heavy post-processing only on capable devices; dropped for good if the frame rate sags
+  const [tier, setTier] = useState<Tier>(lowPower ? 'low' : 'high')
+
+  useEffect(() => {
+    sharedUniforms.uCaustics.value = reduced ? 0 : 1
+  }, [reduced])
+
+  useEffect(() => {
+    if (import.meta.env.DEV) (window as unknown as { __mrQuality: object }).__mrQuality = { tier, dpr }
+  }, [tier, dpr])
 
   return (
     <Canvas
@@ -34,24 +80,32 @@ export default function Experience() {
       eventPrefix="client"
       aria-hidden="true"
     >
-      <PerformanceMonitor
-        onIncline={() => setDpr(lowPower ? 1.25 : 2)}
-        onDecline={() => setDpr(1)}
-        flipflops={3}
-        onFallback={() => setDpr(1)}
+      {/* DPR follows the measured headroom; the tier is decided separately by QualityGuard */}
+      <PerformanceMonitor factor={0.6} onChange={({ factor }) => setDpr(Math.round((1 + factor * (MAX_DPR - 1)) * 4) / 4)} />
+      <QualityGuard
+        onLow={() => {
+          setDpr(1)
+          setTier('low')
+        }}
       />
       <AdaptiveDpr />
-      <Clock />
+      <Clock reduced={reduced} />
       <Atmosphere />
       <CameraRig />
       <WaterSurface />
+      <LightShafts count={lowPower ? 7 : 12} />
+      {!reduced && <MarineSnow count={lowPower ? 700 : 1800} />}
+      {!reduced && <Bubbles count={lowPower ? 60 : 140} />}
       <Suspense fallback={null}>
         <Whale />
         <Mermaid />
         <SunkenCity />
         <Seabed />
         <Fish count={lowPower ? 80 : 160} />
+        {/* compile every shader up front so the first scroll into the city does not hitch */}
+        <Preload all />
       </Suspense>
+      {tier === 'high' && !reduced && <Effects />}
     </Canvas>
   )
 }

@@ -92,6 +92,7 @@ export function SunkenCity() {
   const geos = useCityGeometries()
   const props = usePropGeometries()
   const stone = useMaterial({ rimStrength: 0.4 })
+  const plazaMat = useMaterial({ color: '#9FB8BA', rimStrength: 0.25, caustics: 0.7 })
   const layout = useMemo(cityLayout, [])
 
   return (
@@ -101,9 +102,8 @@ export function SunkenCity() {
       )}
 
       {/* raised plaza the stairs lead up to; the piano stands on it */}
-      <mesh position={[0, FLOOR + 3.5, -46]}>
+      <mesh position={[0, FLOOR + 3.5, -46]} material={plazaMat}>
         <boxGeometry args={[18, 7, 18]} />
-        <meshToonMaterial color="#9FB8BA" />
       </mesh>
       <mesh geometry={props.piano} material={stone} position={[0, FLOOR + 7, -44]} rotation={[0, 0.5, 0]} scale={1.6} />
 
@@ -122,6 +122,7 @@ export function Seabed() {
   const g = usePropGeometries()
   const plain = useMaterial({ rimStrength: 0.3 })
   const weed = useMaterial({ deform: 'seaweed', rim: '#7FE0B0', rimStrength: 0.35 })
+  const sand = useMaterial({ color: '#0C3A4C', rimStrength: 0, caustics: 0.9 })
   const { rocks, corals, weeds } = useMemo(() => {
     const rnd = mulberry32(17)
     const scatter = (n: number, spread: number, s0: number, s1: number): Placement[] =>
@@ -138,9 +139,8 @@ export function Seabed() {
 
   return (
     <group>
-      <mesh rotation-x={-Math.PI / 2} position={[0, FLOOR, -36]}>
+      <mesh rotation-x={-Math.PI / 2} position={[0, FLOOR, -36]} material={sand}>
         <planeGeometry args={[320, 320]} />
-        <meshToonMaterial color="#0C3A4C" />
       </mesh>
       <Instanced geometry={g.rock} material={plain} items={rocks} />
       <Instanced geometry={g.coral} material={plain} items={corals} />
